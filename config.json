@@ -1,0 +1,7 @@
+{
+  "width": 100,
+  "height": 50,
+  "background_char": ".",
+  "palette": " .:-=+*#%@",
+  "plotter_type": "grayscale"
+}
