@@ -2,6 +2,7 @@
 #include "PlotterFactory.hpp"
 #include <fstream>
 #include <iostream>
+#include <chrono>
 
 namespace plotter
 {
@@ -225,38 +226,39 @@ void DemoRunner::DemoCustomPalettes()
 void DemoRunner::CompareFillAlgorithms()
 {
     std::cout << "Запускаем демо сравнения алгоритмов заливки...\n";
-
     Plotter plotter1(50, 30, '.');
     Plotter plotter2(50, 30, '.');
 
     plotter1.DrawRectangle(5, 5, 25, 20, '#');
     plotter1.DrawCircle(35, 15, 8, '*');
-
     plotter2.DrawRectangle(5, 5, 25, 20, '#');
     plotter2.DrawCircle(35, 15, 8, '*');
-    std::stringstream ss;
 
-    ss << "\nInitial canvas: \n";
-    plotter1.Render(ss);
-
-    // Измерьте время выполнения заливки двумя методами
+    auto start1 = std::chrono::high_resolution_clock::now();
     plotter1.FloodFill(10, 10, 'F');
+    auto end1 = std::chrono::high_resolution_clock::now();
+    auto floodfill_time = std::chrono::duration_cast<std::chrono::microseconds>(end1 - start1).count();
 
+    auto start2 = std::chrono::high_resolution_clock::now();
     plotter2.ScanlineFill(10, 10, 'S');
+    auto end2 = std::chrono::high_resolution_clock::now();
+    auto scanline_time = std::chrono::duration_cast<std::chrono::microseconds>(end2 - start2).count();
 
-    ss << "FloodFill time: " << floodfill_time << " microseconds\n";
+    std::stringstream ss;
+    ss << "Initial canvas:\n";
+    plotter1.Render(ss);
+    ss << "\nFloodFill time: " << floodfill_time << " microseconds\n";
     ss << "ScanlineFill time: " << scanline_time << " microseconds\n";
     ss << "Speed ratio: " << static_cast<double>(floodfill_time) / static_cast<double>(scanline_time) << "x\n";
-
     ss << "\nFloodFill result:\n";
     plotter1.Render(ss);
-
     ss << "\nScanlineFill result:\n";
     plotter2.Render(ss);
+
     const auto filename = GetDemoPath("scanline_benchmark.txt");
-    std::ofstream output(filename, std::ios::out | std::ios::trunc);
+    std::ofstream output(filename);
     output << ss.str();
-    std::cout << "\tСохраняем результат в: Demo/scanline_benchmark.txt";
+    std::cout << "\tСохраняем результат в: Demo/scanline_benchmark.txt\n";
 }
 
 } // namespace plotter

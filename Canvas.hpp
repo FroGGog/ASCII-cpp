@@ -50,6 +50,7 @@ private:
     int height_;
     char background_;
     // Добавьте контейнер для хранения данных
+    std::vector<char> data_;
 
 };
 

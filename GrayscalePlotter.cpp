@@ -6,6 +6,12 @@
 namespace plotter
 {
 
+GrayscalePlotter::GrayscalePlotter(std::unique_ptr<Canvas> canvas, const std::vector<char>& palette)
+    : Plotter(std::move(canvas)), palette_(palette.empty() ? DefaultPalette() : palette) {}
+
+GrayscalePlotter::GrayscalePlotter(int width, int height, char background_char, const std::vector<char>& palette)
+    : Plotter(width, height, background_char), palette_(palette.empty() ? DefaultPalette() : palette) {}
+
 std::vector<char> GrayscalePlotter::DefaultPalette()
 {
     return { ' ', '.', ':', '-', '=', '+', '*', '#', '%', '@' };
@@ -424,5 +430,15 @@ void GrayscalePlotter::SetPalette(const std::vector<char>& new_palette)
         }
     }
 }
+
+char GrayscalePlotter::BrightnessToChar(double brightness) const {
+    double clamped = std::clamp(brightness, 0.0, 1.0);
+    if (palette_.empty()) {
+        return ' '; // fallback
+    }
+    size_t index = static_cast<size_t>(clamped * (palette_.size() - 1));
+    return palette_[index];
+}
+
 
 } // namespace plotter
